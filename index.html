@@ -136,6 +136,14 @@
   .spin{width:11px;height:11px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .6s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
 
+  .chev{width:18px;height:18px;color:var(--muted);flex:none;transition:transform .3s;opacity:0;margin-left:2px}
+  .step.show .chev{opacity:1}
+  .step.expand .chev{transform:rotate(90deg)}
+  .step.done .step-top,.step.expand .step-top{cursor:pointer}
+  .step.next{border-color:var(--border-strong);box-shadow:var(--shadow);opacity:1}
+  .step.next .step-ico{background:#eef2ff;color:#3730a3}
+  .chain-foot{display:flex;gap:12px;margin-top:22px;align-items:stretch}
+  .chain-foot .btn{height:50px;font-size:14px}
   .step-body{max-height:0;overflow:hidden;transition:max-height .45s ease;border-top:0 solid var(--border)}
   .step.expand .step-body{max-height:560px;border-top:1px solid var(--border)}
   .body-inner{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -220,7 +228,7 @@
       <div class="brand-title">One number.<br>A complete verified profile.</div>
       <div class="brand-sub">Watch Decentro's smart APIs chain together — identity, KYC, Aadhaar, employment and business signals — from a single mobile number and one consent.</div>
       <div class="brand-stats">
-        <div class="brand-stat"><div class="n">6</div><div class="l">APIs orchestrated</div></div>
+        <div class="brand-stat"><div class="n">7</div><div class="l">APIs orchestrated</div></div>
         <div class="brand-stat"><div class="n">~9s</div><div class="l">to full profile</div></div>
         <div class="brand-stat"><div class="n">1</div><div class="l">consent capture</div></div>
       </div>
@@ -291,10 +299,13 @@
         <div class="pbar"><i id="pbarFill"></i></div>
         <div class="steps" id="steps"></div>
         <div id="nodataMount"></div>
-        <button class="btn btn-primary btn-block btn-lg vis-hidden" id="toReview" style="margin-top:22px">
-          Review compiled profile
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <div class="chain-foot" id="chainFoot">
+          <button class="btn btn-ghost" id="backBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><path d="M19 12H5M11 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn" style="flex:1"></button>
+        </div>
       </section>
 
       <!-- SCREEN 3: REVIEW -->
@@ -303,7 +314,7 @@
         <p class="lead">Every field below was fetched and verified by Decentro from the customer's mobile number. Confirm to complete onboarding.</p>
 
         <div class="summary-strip">
-          <div class="ss"><div class="n" id="ssApis">6/6</div><div class="l">APIs verified</div></div>
+          <div class="ss"><div class="n" id="ssApis">7/7</div><div class="l">APIs verified</div></div>
           <div class="ss"><div class="n">CKYC</div><div class="l">Matched</div></div>
           <div class="ss"><div class="n">Aadhaar</div><div class="l">XML fetched</div></div>
           <div class="ss"><div class="n" id="ssEmp">Salaried</div><div class="l">Employment</div></div>
@@ -330,7 +341,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <h1>Onboarding successful</h1>
-          <p id="successMsg">The customer's verified profile has been created and stored. All six Decentro verification sources matched.</p>
+          <p id="successMsg">The customer's verified profile has been created and stored. All seven Decentro verification sources matched.</p>
           <div class="ref">Reference ID: <b id="refId">—</b></div>
           <button class="btn btn-primary btn-lg" id="freshBtn" style="margin-top:26px">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -356,6 +367,10 @@
     address:"402, Brigade Towers, 80 Feet Road, Koramangala, Bengaluru, Karnataka — 560034",
     altMobile:"+91 91082 33xxx",
     email:"rajesh.sharma@email.com",
+    bankName:"HDFC Bank",
+    accountMasked:"XXXXXX 7788",
+    ifsc:"HDFC0001234",
+    accountType:"Savings",
     ckycId:"5012 3456 7890 1234",
     poi:"PAN Card",
     poa:"Aadhaar (offline KYC)",
@@ -363,7 +378,7 @@
     employer:"Infosys Ltd.",
     uan:"1001 2345 6789",
     empStatus:"Employed (Active)",
-    udyam:"No active Udyam / MSME registration"
+    udyam:"No business linked"
   };
 
   // ---------- Step definitions (the chain) ----------
@@ -375,7 +390,16 @@
       endpoint:"POST /v2/bytes/mobile_intelligence",
       req:function(s){return '{\n  "mobile": "'+s.activeMobile+'"\n}';},
       out:function(){return [["Name on record",persona.name],["Match confidence","High · 0.96"]];},
-      pass:"Name + mobile passed to Profile Prefill"
+      pass:"Mobile passed to Account Lookup"
+    },
+    {
+      id:"account", name:"Account Details", api:"Bytes · Mobile to Bank Account",
+      desc:"Find the bank account linked to the mobile number",
+      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4" stroke-linecap="round"/></svg>',
+      endpoint:"POST /v2/bytes/mobile_to_account",
+      req:function(s){return '{\n  "mobile": "'+s.activeMobile+'"\n}';},
+      out:function(){return [["Bank",persona.bankName],["Account (masked)",persona.accountMasked],["IFSC",persona.ifsc],["Account holder",persona.name]];},
+      pass:"Account holder name corroborates identity"
     },
     {
       id:"prefill", name:"Profile Prefill", api:"Bytes · Customer Data Pull",
@@ -419,7 +443,7 @@
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       endpoint:"POST /kyc/pan_to_udyam",
       req:function(s){return '{\n  "pan": "'+persona.pan+'",\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["Udyam / MSME",persona.udyam],["Profile type","Salaried — no business entity"]];},
+      out:function(){return [["Business / MSME",persona.udyam],["Udyam registration","Not found"]];},
       pass:null
     }
   ];
@@ -468,7 +492,8 @@
   }
 
   // ---------- Chain build ----------
-  var stepsMount=$('#steps'), nodataMount=$('#nodataMount'), toReview=$('#toReview');
+  var stepsMount=$('#steps'), nodataMount=$('#nodataMount'),
+      backBtn=$('#backBtn'), nextBtn=$('#nextBtn');
 
   function buildStepEls(){
     stepsMount.innerHTML='';
@@ -482,6 +507,7 @@
             '<div class="step-desc">'+st.desc+'</div>'+
           '</div>'+
           '<div class="step-state"><span class="badge b-wait">Queued</span></div>'+
+          '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
         '</div>'+
         '<div class="step-body"><div class="body-inner">'+
           '<div><div class="term-label">Request · '+st.endpoint+'</div><div class="term" id="req-'+st.id+'"></div></div>'+
@@ -489,6 +515,10 @@
         '</div>'+
         (st.pass?'<div class="arrow-pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>'+st.pass+'</div>':'')+
         '</div>';
+      wrap.querySelector('.step-top').addEventListener('click',function(){
+        if(busy) return;
+        if(i < pulled){ setFocus(i); updateFooter(); }   // revisit a completed step
+      });
       stepsMount.appendChild(wrap);
     });
   }
@@ -522,54 +552,91 @@
     $('#chainPct').textContent=pct+'%';
   }
 
-  // ---------- Run the chain ----------
+  // ---------- Stepping engine (manual next / back) ----------
+  var TOTAL=STEPS.length;
+  var pulled=0, focus=-1, busy=false, blocked=false;
+
   function beginChain(){
     state.removedOther=false; state.otherMobile=null; state.primaryMobile=null;
+    pulled=0; focus=-1; busy=false; blocked=false;
     setCrumb('chain'); show('screen-chain');
-    toReview.classList.add('vis-hidden');
     nodataMount.innerHTML='';
     buildStepEls();
-    setProgress(0,STEPS.length);
-    runFrom(0);
+    setProgress(0,TOTAL);
+    revealNext();
+    updateFooter();
+    window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  async function runFrom(startIndex){
-    for(var i=startIndex;i<STEPS.length;i++){
-      var st=STEPS[i], node=$('#st-'+st.id);
-      node.classList.add('show','active');
-      node.scrollIntoView({behavior:'smooth',block:'center'});
-      setBadge(st.id,'b-proc','Calling…',true);
-      renderReq(st);
-      node.classList.add('expand');
-      await wait(1100);
+  function revealNext(){
+    document.querySelectorAll('.step').forEach(function(s){s.classList.remove('next');});
+    if(pulled<TOTAL){ var n=$('#st-'+STEPS[pulled].id); n.classList.add('show','next'); }
+  }
 
-      // Edge case: identity step with non-primary number returns empty
-      if(st.id==='identity' && isNonPrimary(state.activeMobile)){
-        setBadge(st.id,'b-empty','No record');
-        node.classList.remove('active');
-        var out=$('#out-'+st.id);
-        out.innerHTML='<div class="out-row"><span class="out-k">Result</span><span class="out-v" style="color:#854d0e">No identity linked</span></div>';
-        renderNoData();
-        return; // pause chain until user resolves
-      }
+  function setFocus(i){
+    focus=i;
+    STEPS.forEach(function(st,idx){ $('#st-'+st.id).classList.toggle('expand', idx===i); });
+    if(i>=0){ $('#st-'+STEPS[i].id).scrollIntoView({behavior:'smooth',block:'center'}); }
+  }
 
-      renderOut(st);
-      setBadge(st.id,'b-done','Verified');
-      node.classList.remove('active'); node.classList.add('done');
-      setProgress(i+1,STEPS.length);
-      await wait(450);
-      // collapse completed step body to keep view tidy (keep last open briefly)
-      if(i>0){ $('#st-'+STEPS[i-1].id).classList.remove('expand'); }
+  async function pullStep(i){
+    var st=STEPS[i], node=$('#st-'+st.id);
+    busy=true; blocked=false; updateFooter();
+    node.classList.remove('next'); node.classList.add('show','active');
+    setFocus(i);
+    setBadge(st.id,'b-proc','Calling…',true);
+    renderReq(st);
+    await wait(1100);
+
+    // Edge case: identity with a non-primary number returns no record
+    if(st.id==='identity' && isNonPrimary(state.activeMobile)){
+      setBadge(st.id,'b-empty','No record');
+      node.classList.remove('active');
+      $('#out-'+st.id).innerHTML='<div class="out-row"><span class="out-k">Result</span><span class="out-v" style="color:#854d0e">No identity linked</span></div>';
+      busy=false; blocked=true;
+      renderNoData(); updateFooter();
+      return;
     }
-    // done
+
+    renderOut(st);
+    setBadge(st.id,'b-done','Verified');
+    node.classList.remove('active'); node.classList.add('done');
+    pulled=i+1; focus=i;
+    setProgress(pulled,TOTAL);
+    revealNext();
+    busy=false; updateFooter();
+  }
+
+  var ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var DLOAD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M12 3v12M7 11l5 5 5-5M5 21h14" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function updateFooter(){
+    backBtn.disabled = busy || blocked || focus<=0;
+    var label;
+    if(pulled>=TOTAL && focus>=TOTAL-1){ label='Review compiled profile '+ARROW; }
+    else if(focus < pulled-1){ label='Next '+ARROW; }                 // walking through pulled steps
+    else if(pulled < TOTAL){ label=DLOAD+' Pull next: '+STEPS[pulled].name; }
+    else { label='Review compiled profile '+ARROW; }
+    nextBtn.innerHTML=label;
+    nextBtn.disabled = busy || blocked;
+  }
+
+  function goReview(){
     state.primaryMobile=state.activeMobile;
-    if(state.enteredMobile && state.enteredMobile!==state.primaryMobile){
-      state.otherMobile=state.enteredMobile;
-    }
-    $('#st-'+STEPS[STEPS.length-1].id).classList.remove('expand');
-    toReview.classList.remove('vis-hidden');
-    toReview.scrollIntoView({behavior:'smooth',block:'center'});
+    if(state.enteredMobile && state.enteredMobile!==state.primaryMobile){ state.otherMobile=state.enteredMobile; }
+    buildReview(); setCrumb('review'); show('screen-review'); window.scrollTo({top:0,behavior:'smooth'});
   }
+
+  nextBtn.addEventListener('click',function(){
+    if(busy||blocked) return;
+    if(pulled>=TOTAL && focus>=TOTAL-1){ goReview(); return; }
+    if(focus < pulled-1){ setFocus(focus+1); updateFooter(); return; }  // advance through history
+    if(pulled < TOTAL){ pullStep(pulled); }
+  });
+  backBtn.addEventListener('click',function(){
+    if(busy||blocked) return;
+    if(focus>0){ setFocus(focus-1); updateFooter(); }
+  });
 
   // ---------- No-data inline panel ----------
   function renderNoData(){
@@ -589,20 +656,18 @@
     altGo.addEventListener('click',function(){
       var v=alt.value;
       if(!/^[6-9]\d{9}$/.test(v)){altErr.style.display='block';return;}
-      // keep original as "other", run chain again with new number from identity step
+      // keep original as "other", retry from the identity step with the new number
       state.otherMobile=state.activeMobile;
       state.activeMobile=v;
       nodataMount.innerHTML='';
-      // reset all step visuals
-      buildStepEls(); setProgress(0,STEPS.length);
-      runFrom(0);
+      pulled=0; focus=-1; blocked=false; busy=false;
+      buildStepEls(); setProgress(0,TOTAL);
+      pullStep(0);
     });
     alt.focus();
   }
 
   // ---------- Review ----------
-  toReview.addEventListener('click',function(){ buildReview(); setCrumb('review'); show('screen-review'); window.scrollTo({top:0,behavior:'smooth'}); });
-
   function numbersBlock(){
     var html='<div class="numbers">';
     html+='<span class="num-chip primary"><span class="tag tag-primary">Primary</span>'+fmtMobile(state.primaryMobile)+'</span>';
@@ -625,6 +690,12 @@
         '<div class="kv"><span class="k">Mobile numbers</span><span class="v" style="text-align:right"></span></div></div>'+
         '<div style="padding:0 16px 8px" id="numbersMount"></div>')+
 
+      sec('Bank Account','Bytes · Mobile to Bank Account',
+        kv('Bank', persona.bankName, null)+
+        kv('Account (masked)', persona.accountMasked, 'Verified')+
+        kv('IFSC', persona.ifsc, null)+
+        kv('Account holder', persona.name, null))+
+
       sec('PAN & Address','Bytes · Customer Data Pull',
         kv('PAN', persona.pan, 'Verified')+
         kv('Address', persona.address, 'Verified')+
@@ -645,8 +716,8 @@
         kv('Status', persona.empStatus, 'Active'))+
 
       sec('Business / MSME','Bytes · PAN to Udyam',
-        kv('Udyam / MSME', persona.udyam, null, true)+
-        kv('Profile type', 'Salaried — no business entity', null));
+        kv('Business / MSME', persona.udyam, null, true)+
+        kv('Udyam registration', 'Not found', null));
 
     // mount numbers + remove handler
     $('#numbersMount').innerHTML = numbersBlock();
@@ -675,7 +746,7 @@
     var ref='DCNTRO-'+Math.random().toString(36).slice(2,7).toUpperCase()+'-'+Date.now().toString().slice(-5);
     $('#refId').textContent=ref;
     var extra = state.otherMobile && !state.removedOther ? ' One secondary number was retained on the profile.' : '';
-    $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All six Decentro verification sources matched.'+extra;
+    $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All seven Decentro verification sources matched.'+extra;
     setCrumb('success'); show('screen-success'); window.scrollTo({top:0,behavior:'smooth'});
   });
 
