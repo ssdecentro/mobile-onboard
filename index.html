@@ -55,7 +55,7 @@
   .brand-stat .n{font-size:22px;font-weight:800}
   .brand-stat .l{font-size:11px;color:#9fb0c9;margin-top:2px}
   .brand-foot{margin-top:30px;font-size:11px;color:#64748b;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .npci{border:1px solid #1e2c47;border-radius:100px;padding:4px 10px;color:#9fb0c9}
+  .brand-chip{border:1px solid #1e2c47;border-radius:100px;padding:4px 10px;color:#9fb0c9}
   @media (max-width:920px){ .brand-head{margin-top:20px} .brand-title{font-size:24px} .brand-stats{display:none} }
 
   /* ---------- STAGE ---------- */
@@ -286,15 +286,14 @@
     <div class="brand-head">
       <div class="brand-eyebrow">Mobile-First KYC</div>
       <div class="brand-title">One number.<br>A complete verified profile.</div>
-      <div class="brand-sub">Watch Decentro's smart APIs chain together — bank account &amp; UPI, identity, KYC, Aadhaar, employment and MSME signals — from a single mobile number and one consent.</div>
+      <div class="brand-sub">Watch Decentro's smart APIs chain together — bank account &amp; UPI, identity, KYC, Aadhaar and employment signals — from a single mobile number and one consent.</div>
       <div class="brand-stats">
-        <div class="brand-stat"><div class="n">6</div><div class="l">APIs orchestrated</div></div>
-        <div class="brand-stat"><div class="n">~9s</div><div class="l">to full profile</div></div>
+        <div class="brand-stat"><div class="n">5</div><div class="l">APIs orchestrated</div></div>
+        <div class="brand-stat"><div class="n">&lt;1 min</div><div class="l">to full profile</div></div>
         <div class="brand-stat"><div class="n">1</div><div class="l">consent capture</div></div>
       </div>
       <div class="brand-foot">
-        <span class="npci">NPCI Certified</span>
-        <span class="npci">RBI-aligned KYC</span>
+        <span class="brand-chip">RBI-aligned KYC</span>
         <span>decentro.tech</span>
       </div>
     </div>
@@ -333,7 +332,7 @@
 
           <label class="consent" for="consent">
             <input type="checkbox" id="consent" />
-            <span class="ct"><b>I consent</b> to Decentro retrieving and verifying my bank account &amp; UPI, identity, KYC, Aadhaar (offline XML), employment and business records linked to this mobile number, in line with applicable <a href="#" onclick="return false">data &amp; privacy regulations</a>.</span>
+            <span class="ct"><b>I consent</b> to Decentro retrieving and verifying my bank account &amp; UPI, identity, KYC, Aadhaar (offline XML) and employment records linked to this mobile number, in line with applicable <a href="#" onclick="return false">data &amp; privacy regulations</a>.</span>
           </label>
 
           <button class="btn btn-primary btn-block btn-lg" id="startBtn" style="margin-top:18px" disabled>
@@ -385,10 +384,10 @@
         <p class="lead">Every field below was fetched and verified by Decentro from the customer's mobile number. Confirm to complete onboarding.</p>
 
         <div class="summary-strip">
-          <div class="ss"><div class="n" id="ssApis">6/6</div><div class="l">APIs verified</div></div>
+          <div class="ss"><div class="n" id="ssApis">5/5</div><div class="l">APIs verified</div></div>
           <div class="ss"><div class="n">CKYC</div><div class="l">Matched</div></div>
           <div class="ss"><div class="n">Aadhaar</div><div class="l">XML fetched</div></div>
-          <div class="ss"><div class="n">MSME</div><div class="l">Udyam active</div></div>
+          <div class="ss"><div class="n">EPFO</div><div class="l">Employment verified</div></div>
         </div>
 
         <div class="rev-grid" id="revGrid"></div>
@@ -412,7 +411,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <h1>Onboarding successful</h1>
-          <p id="successMsg">The customer's verified profile has been created and stored. All six Decentro verification sources matched.</p>
+          <p id="successMsg">The customer's verified profile has been created and stored. All five Decentro verification sources matched.</p>
           <div class="ref">Reference ID: <b id="refId">—</b></div>
           <button class="btn btn-primary btn-lg" id="freshBtn" style="margin-top:26px">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -458,11 +457,7 @@
     uan:"1001 2345 6789",
     empStatus:"Employed (Active)",
     doj:"12 Jun 2017",
-    doe:"—",
-    udyamNumber:"UDYAM-KR-03-0123456",
-    enterpriseName:"Sharma Trading Co.",
-    enterpriseType:"Micro Enterprise",
-    udyamStatus:"Active"
+    doe:"—"
   };
 
   // ---------- Step definitions (the chain) ----------
@@ -510,15 +505,6 @@
       endpoint:"POST /v2/kyc/employment/verification",
       req:function(s){return '{\n  "mobile": "'+s.activeMobile+'"\n}';},
       out:function(){return [["Employer",persona.employer],["UAN",persona.uan],["Status",persona.empStatus],["Date of joining",persona.doj],["Date of exit",persona.doe]];},
-      pass:"Mobile + PAN passed to Business check"
-    },
-    {
-      id:"udyam", name:"Business / MSME Check", api:"Bytes · PAN to Udyam",
-      desc:"Detect self-employment or MSME registration",
-      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      endpoint:"POST /kyc/pan_to_udyam",
-      req:function(s){return '{\n  "pan": "'+persona.pan+'",\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["Udyam reg. number",persona.udyamNumber],["Enterprise",persona.enterpriseName],["Type",persona.enterpriseType],["Status",persona.udyamStatus]];},
       pass:null
     }
   ];
@@ -529,8 +515,7 @@
     prefill:   function(s){return [["Name · "+persona.name,"Account Lookup"],["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
     ckyc:      function(){return [["PAN · "+persona.pan,"Profile Prefill"],["DOB · "+persona.dob,"Profile Prefill"]];},
     digilocker:function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
-    epfo:      function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"],["Name · "+persona.name,"Account Lookup"]];},
-    udyam:     function(s){return [["PAN · "+persona.pan,"Profile Prefill"],["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];}
+    epfo:      function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"],["Name · "+persona.name,"Account Lookup"]];}
   };
 
   // ---------- Per-step data checklist (shows only the current step's points) ----------
@@ -539,8 +524,7 @@
     {step:'prefill',   items:['PAN','Date of birth','Gender','Address','Email']},
     {step:'ckyc',      items:['CKYC number','Father’s name','Proof of identity','Proof of address']},
     {step:'digilocker',items:['PAN (DigiLocker)','Aadhaar XML']},
-    {step:'epfo',      items:['Employer','UAN','Date of joining']},
-    {step:'udyam',     items:['Udyam number','Enterprise','Type']}
+    {step:'epfo',      items:['Employer','UAN','Date of joining']}
   ];
   var CL_BY = {}; CHECKLIST.forEach(function(g){ CL_BY[g.step]=g.items; });
   var SC_TICK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -873,13 +857,7 @@
         kv('UAN', persona.uan, null)+
         kv('Status', persona.empStatus, 'Active')+
         kv('Date of joining', persona.doj, null)+
-        kv('Date of exit', persona.doe, null))+
-
-      sec('Business / MSME','Bytes · PAN to Udyam',
-        kv('Udyam reg. number', persona.udyamNumber, 'Registered')+
-        kv('Enterprise', persona.enterpriseName, null)+
-        kv('Type', persona.enterpriseType, null)+
-        kv('Status', persona.udyamStatus, 'Active'));
+        kv('Date of exit', persona.doe, null));
 
     // mount numbers + remove handler
     $('#numbersMount').innerHTML = numbersBlock();
@@ -908,7 +886,7 @@
     var ref='DCNTRO-'+Math.random().toString(36).slice(2,7).toUpperCase()+'-'+Date.now().toString().slice(-5);
     $('#refId').textContent=ref;
     var extra = state.otherMobile && !state.removedOther ? ' One secondary number was retained on the profile.' : '';
-    $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All six Decentro verification sources matched.'+extra;
+    $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All five Decentro verification sources matched.'+extra;
     setCrumb('success'); show('screen-success'); window.scrollTo({top:0,behavior:'smooth'});
   });
 
