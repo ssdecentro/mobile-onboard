@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Decentro · Mobile-First Onboarding</title>
+<title>Decentro · Mobile-First Onboarding (Account-First)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -62,6 +62,15 @@
   .stage{padding:38px 44px;display:flex;flex-direction:column;min-height:100vh}
   @media (max-width:920px){ .stage{padding:24px 18px;min-height:auto} }
   .stage-inner{width:100%;max-width:760px;margin:0 auto;flex:1;display:flex;flex-direction:column}
+  /* per-step data checklist — compact strip under the loader, left-aligned */
+  .step-check{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:0 0 20px}
+  .sc-label{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-right:3px}
+  .sc-item{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--border);border-radius:100px;padding:4px 10px 4px 6px;transition:.25s}
+  .sc-item .sc-tick{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex:none;display:flex;align-items:center;justify-content:center;background:#fff;transition:.25s}
+  .sc-item .sc-tick svg{width:9px;height:9px;color:#fff;opacity:0;transition:opacity .25s}
+  .sc-item.done{color:var(--fg);border-color:var(--success-bd);background:#f0fdf4}
+  .sc-item.done .sc-tick{background:var(--accent);border-color:var(--accent)}
+  .sc-item.done .sc-tick svg{opacity:1}
 
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:26px}
   .crumbs{font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:8px}
@@ -123,7 +132,7 @@
   .chain-progress{font-size:12px;font-weight:700;color:var(--subtle)}
   .pbar{height:6px;background:var(--surface);border-radius:100px;overflow:hidden;margin:14px 0 10px}
   .pbar > i{display:block;height:100%;width:0;background:#000;border-radius:100px;transition:width .5s ease}
-  .step-counter{font-size:12px;font-weight:700;color:var(--subtle);margin-bottom:20px;min-height:15px}
+  .step-counter{font-size:12px;font-weight:700;color:var(--subtle);margin-bottom:12px;min-height:15px}
 
   .steps{display:flex;flex-direction:column;gap:12px}
   .steps .step{display:none}
@@ -154,7 +163,7 @@
   .chain-foot{display:flex;gap:12px;margin-top:22px;align-items:stretch}
   .chain-foot .btn{height:50px;font-size:14px}
   .step-body{max-height:0;overflow:hidden;transition:max-height .45s ease;border-top:0 solid var(--border)}
-  .step.expand .step-body{max-height:560px;border-top:1px solid var(--border)}
+  .step.expand .step-body{max-height:2400px;border-top:1px solid var(--border)}
   .body-inner{padding:14px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px}
   .term{background:#0b1220;border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#cbd5e1;overflow:auto;white-space:pre-wrap;word-break:break-word}
   .term .k{color:#7dd3fc}
@@ -182,8 +191,10 @@
   .nodata h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
   .nodata h3 svg{width:18px;height:18px;color:var(--pending-fg)}
   .nodata p{font-size:13px;color:var(--subtle);margin-top:8px}
-  .nodata .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-  .nodata .phone-wrap{flex:1;min-width:220px}
+  .nodata .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:stretch}
+  .nodata .phone-wrap{flex:1;min-width:200px}
+  .nodata .row .btn{height:46px;white-space:nowrap}
+  @media (max-width:430px){ .nodata .row .btn{flex:1 1 100%} }
   .keepnote{font-size:11.5px;color:var(--muted);margin-top:11px;display:flex;gap:7px;align-items:flex-start}
   .keepnote svg{width:14px;height:14px;flex:none;margin-top:1px;color:var(--subtle)}
 
@@ -275,9 +286,9 @@
     <div class="brand-head">
       <div class="brand-eyebrow">Mobile-First KYC</div>
       <div class="brand-title">One number.<br>A complete verified profile.</div>
-      <div class="brand-sub">Watch Decentro's smart APIs chain together — identity, KYC, Aadhaar, employment and business signals — from a single mobile number and one consent.</div>
+      <div class="brand-sub">Watch Decentro's smart APIs chain together — bank account &amp; UPI, identity, KYC, Aadhaar, employment and MSME signals — from a single mobile number and one consent.</div>
       <div class="brand-stats">
-        <div class="brand-stat"><div class="n">7</div><div class="l">APIs orchestrated</div></div>
+        <div class="brand-stat"><div class="n">6</div><div class="l">APIs orchestrated</div></div>
         <div class="brand-stat"><div class="n">~9s</div><div class="l">to full profile</div></div>
         <div class="brand-stat"><div class="n">1</div><div class="l">consent capture</div></div>
       </div>
@@ -322,7 +333,7 @@
 
           <label class="consent" for="consent">
             <input type="checkbox" id="consent" />
-            <span class="ct"><b>I consent</b> to Decentro retrieving and verifying my identity, KYC, Aadhaar (offline XML), employment and business records linked to this mobile number, in line with applicable <a href="#" onclick="return false">data &amp; privacy regulations</a>.</span>
+            <span class="ct"><b>I consent</b> to Decentro retrieving and verifying my bank account &amp; UPI, identity, KYC, Aadhaar (offline XML), employment and business records linked to this mobile number, in line with applicable <a href="#" onclick="return false">data &amp; privacy regulations</a>.</span>
           </label>
 
           <button class="btn btn-primary btn-block btn-lg" id="startBtn" style="margin-top:18px" disabled>
@@ -356,6 +367,7 @@
         </div>
         <div class="pbar"><i id="pbarFill"></i></div>
         <div class="step-counter" id="stepCounter"></div>
+        <div class="step-check" id="stepCheck"></div>
         <div class="steps" id="steps"></div>
         <div id="nodataMount"></div>
         <div class="chain-foot" id="chainFoot">
@@ -373,10 +385,10 @@
         <p class="lead">Every field below was fetched and verified by Decentro from the customer's mobile number. Confirm to complete onboarding.</p>
 
         <div class="summary-strip">
-          <div class="ss"><div class="n" id="ssApis">7/7</div><div class="l">APIs verified</div></div>
+          <div class="ss"><div class="n" id="ssApis">6/6</div><div class="l">APIs verified</div></div>
           <div class="ss"><div class="n">CKYC</div><div class="l">Matched</div></div>
           <div class="ss"><div class="n">Aadhaar</div><div class="l">XML fetched</div></div>
-          <div class="ss"><div class="n" id="ssEmp">Salaried</div><div class="l">Employment</div></div>
+          <div class="ss"><div class="n">MSME</div><div class="l">Udyam active</div></div>
         </div>
 
         <div class="rev-grid" id="revGrid"></div>
@@ -400,7 +412,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <h1>Onboarding successful</h1>
-          <p id="successMsg">The customer's verified profile has been created and stored. All seven Decentro verification sources matched.</p>
+          <p id="successMsg">The customer's verified profile has been created and stored. All six Decentro verification sources matched.</p>
           <div class="ref">Reference ID: <b id="refId">—</b></div>
           <button class="btn btn-primary btn-lg" id="freshBtn" style="margin-top:26px">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -424,68 +436,72 @@
     dob:"14 Aug 1989",
     gender:"Male",
     address:"402, Brigade Towers, 80 Feet Road, Koramangala, Bengaluru, Karnataka — 560034",
-    altMobile:"+91 91082 33xxx",
+    altMobile:"+91 91082 33145",
     email:"rajesh.sharma@email.com",
     bankName:"HDFC Bank",
-    accountMasked:"XXXXXX 7788",
+    accountNumber:"50100247890188",
     ifsc:"HDFC0001234",
     accountType:"Savings",
-    ckycId:"5012 3456 7890 1234",
+    upiId:"rajesh.sharma@okhdfcbank",
+    ckycId:"50123456789012",
+    ckycRef:"CKYCR-50123456",
+    constitution:"Individual",
+    ckycAccountType:"Normal",
+    fathersName:"Mahesh Kumar Sharma",
+    kycDate:"24 Aug 2023",
+    numIdentity:"1",
+    numImages:"2",
     poi:"PAN Card",
-    poa:"Aadhaar (offline KYC)",
+    poa:"Proof of Possession of Aadhaar",
     aadhaarMasked:"XXXX XXXX 4521",
     employer:"Infosys Ltd.",
     uan:"1001 2345 6789",
     empStatus:"Employed (Active)",
-    udyam:"No business linked"
+    doj:"12 Jun 2017",
+    doe:"—",
+    udyamNumber:"UDYAM-KR-03-0123456",
+    enterpriseName:"Sharma Trading Co.",
+    enterpriseType:"Micro Enterprise",
+    udyamStatus:"Active"
   };
 
   // ---------- Step definitions (the chain) ----------
   var STEPS = [
     {
-      id:"identity", name:"Identity Lookup", api:"Bytes · Mobile Intelligence",
-      desc:"Resolve the name linked to the mobile number",
-      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg>',
-      endpoint:"POST /v2/bytes/mobile_intelligence",
-      req:function(s){return '{\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["Name on record",persona.name],["Match confidence","High · 0.96"]];},
-      pass:"Mobile passed to Account Lookup"
-    },
-    {
-      id:"account", name:"Account Details", api:"Bytes · Mobile to Bank Account",
-      desc:"Find the bank account linked to the mobile number",
+      id:"account", name:"Account Lookup", api:"Payments · Mobile to Account (V3)",
+      desc:"Fetch the bank account & UPI linked to the number",
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4" stroke-linecap="round"/></svg>',
-      endpoint:"POST /v2/bytes/mobile_to_account",
-      req:function(s){return '{\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["Bank",persona.bankName],["Account (masked)",persona.accountMasked],["IFSC",persona.ifsc],["Account holder",persona.name]];},
-      pass:"Account holder name corroborates identity"
+      endpoint:"POST /v3/payments/mobile_to_account",
+      req:function(s){return '{\n  "reference_id": "DCNTR-'+s.activeMobile.slice(-6)+'",\n  "consumer_urn": "URN'+s.activeMobile.slice(-5)+'",\n  "mobile_number": "'+s.activeMobile+'"\n}';},
+      out:function(){return [["Account holder",persona.name],["Account number",persona.accountNumber],["IFSC",persona.ifsc],["Account type",persona.accountType],["UPI ID",persona.upiId],["Validation","₹1 penny-drop · name matched"]];},
+      pass:"Account holder name passed to Profile Prefill"
     },
     {
       id:"prefill", name:"Profile Prefill", api:"Bytes · Customer Data Pull",
-      desc:"Fetch PAN, DOB, address & alternate contacts",
+      desc:"Fetch PAN, DOB, address & contacts (mobile unmasked)",
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6" stroke-linecap="round"/></svg>',
-      endpoint:"POST /v2/financial_services/customer/data_pull",
-      req:function(s){return '{\n  "name": "'+persona.name+'",\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["PAN",persona.pan],["Date of birth",persona.dob],["Address",persona.address],["Alt. contact",persona.altMobile]];},
+      endpoint:"POST /v2/financial_services/data/pull",
+      req:function(s){return '{\n  "reference_id": "DCNTR-'+s.activeMobile.slice(-6)+'",\n  "consent": true,\n  "consent_purpose": "Customer onboarding & KYC verification",\n  "name": "'+persona.name+'",\n  "mobile": "'+s.activeMobile+'"\n}';},
+      out:function(){return [["PAN",persona.pan],["Date of birth",persona.dob],["Gender",persona.gender],["Address",persona.address],["Phone (on record)",fmtMobile(state.activeMobile)],["Email",persona.email]];},
       pass:"PAN + DOB passed to CKYC Search"
     },
     {
-      id:"ckyc", name:"CKYC Verification", api:"Identities · CKYC Search + Download",
-      desc:"Match the central KYC record, pull POI & POA",
+      id:"ckyc", name:"CKYC Search + Download", api:"Identities · CKYC",
+      desc:"Search by PAN, download the full central-KYC record",
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg>',
-      endpoint:"POST /kyc/ckyc/search → /kyc/ckyc/download",
-      req:function(){return '{\n  "id_type": "PAN",\n  "id_number": "'+persona.pan+'",\n  "date_of_birth": "1989-08-14"\n}';},
-      out:function(){return [["CKYC ID",persona.ckycId],["Proof of identity",persona.poi],["Proof of address",persona.poa]];},
-      pass:"PAN + POI/POA passed to DigiLocker"
+      endpoint:"POST /v2/kyc/ckyc/search → /download/validate-otp",
+      req:function(){return '{\n  "reference_id": "DCNTR-CKYC01",\n  "document_type": "PAN",\n  "id_number": "'+persona.pan+'",\n  "consent": true,\n  "consent_purpose": "Customer onboarding & KYC verification"\n}';},
+      out:function(){return [["CKYC number",persona.ckycId],["CKYC reference",persona.ckycRef],["Constitution",persona.constitution],["Account type",persona.ckycAccountType],["Name on record",persona.name],["Father's name",persona.fathersName],["Gender",persona.gender],["DOB (matched)",persona.dob],["PAN",persona.pan],["Permanent address",persona.address],["Proof of identity",persona.poi],["Proof of address",persona.poa],["KYC date",persona.kycDate],["Identities on record",persona.numIdentity],["Photo / images","Available · "+persona.numImages]];},
+      pass:"CKYC matched · proceeding to DigiLocker"
     },
     {
-      id:"digilocker", name:"DigiLocker Aadhaar", api:"Identities · DigiLocker eAadhaar",
-      desc:"Fetch government-verified Aadhaar XML",
+      id:"digilocker", name:"DigiLocker Fetch", api:"Identities · DigiLocker",
+      desc:"Fetch PAN & Aadhaar XML from DigiLocker via mobile",
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg>',
-      endpoint:"POST /kyc/digilocker/eaadhaar",
-      req:function(){return '{\n  "purpose": "ONBOARDING",\n  "id_number": "'+persona.pan+'",\n  "documents": ["AADHAAR"]\n}';},
-      out:function(){return [["Aadhaar (masked)",persona.aadhaarMasked],["Name on Aadhaar",persona.name],["Source","DigiLocker · Issued XML"]];},
-      pass:"Mobile passed to Employment Verification"
+      endpoint:"POST /kyc/digilocker/documents",
+      req:function(s){return '{\n  "reference_id": "DCNTR-'+s.activeMobile.slice(-6)+'",\n  "purpose": "ONBOARDING",\n  "mobile": "'+s.activeMobile+'",\n  "documents": ["PAN", "AADHAAR"]\n}';},
+      out:function(){return [["PAN (DigiLocker)",persona.pan],["Aadhaar (masked)",persona.aadhaarMasked],["Name on record",persona.name],["Source","DigiLocker · Issued XML"]];},
+      pass:"Mobile + PAN passed to Employment Verification"
     },
     {
       id:"epfo", name:"Employment Verification", api:"Identities · Employment (EPFO)",
@@ -493,8 +509,8 @@
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" stroke-linecap="round"/></svg>',
       endpoint:"POST /v2/kyc/employment/verification",
       req:function(s){return '{\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["Employer",persona.employer],["UAN",persona.uan],["Status",persona.empStatus]];},
-      pass:"Mobile + PAN passed to Udyam check"
+      out:function(){return [["Employer",persona.employer],["UAN",persona.uan],["Status",persona.empStatus],["Date of joining",persona.doj],["Date of exit",persona.doe]];},
+      pass:"Mobile + PAN passed to Business check"
     },
     {
       id:"udyam", name:"Business / MSME Check", api:"Bytes · PAN to Udyam",
@@ -502,21 +518,45 @@
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       endpoint:"POST /kyc/pan_to_udyam",
       req:function(s){return '{\n  "pan": "'+persona.pan+'",\n  "mobile": "'+s.activeMobile+'"\n}';},
-      out:function(){return [["Business / MSME",persona.udyam],["Udyam registration","Not found"]];},
+      out:function(){return [["Udyam reg. number",persona.udyamNumber],["Enterprise",persona.enterpriseName],["Type",persona.enterpriseType],["Status",persona.udyamStatus]];},
       pass:null
     }
   ];
 
   // ---------- Inherited inputs (what each call reuses from previous pulls) ----------
   var FEED = {
-    identity:  function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
     account:   function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
-    prefill:   function(s){return [["Name · "+persona.name,"Identity Lookup"],["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
+    prefill:   function(s){return [["Name · "+persona.name,"Account Lookup"],["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
     ckyc:      function(){return [["PAN · "+persona.pan,"Profile Prefill"],["DOB · "+persona.dob,"Profile Prefill"]];},
-    digilocker:function(){return [["PAN · "+persona.pan,"Profile Prefill"],["POI + POA · PAN, Aadhaar","CKYC Verification"]];},
-    epfo:      function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"],["Name · "+persona.name,"Identity Lookup"]];},
+    digilocker:function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];},
+    epfo:      function(s){return [["Mobile "+fmtMobile(s.activeMobile),"Customer input"],["Name · "+persona.name,"Account Lookup"]];},
     udyam:     function(s){return [["PAN · "+persona.pan,"Profile Prefill"],["Mobile "+fmtMobile(s.activeMobile),"Customer input"]];}
   };
+
+  // ---------- Per-step data checklist (shows only the current step's points) ----------
+  var CHECKLIST = [
+    {step:'account',   items:['Account holder','Account number','IFSC','Account type','UPI ID']},
+    {step:'prefill',   items:['PAN','Date of birth','Gender','Address','Email']},
+    {step:'ckyc',      items:['CKYC number','Father’s name','Proof of identity','Proof of address']},
+    {step:'digilocker',items:['PAN (DigiLocker)','Aadhaar XML']},
+    {step:'epfo',      items:['Employer','UAN','Date of joining']},
+    {step:'udyam',     items:['Udyam number','Enterprise','Type']}
+  ];
+  var CL_BY = {}; CHECKLIST.forEach(function(g){ CL_BY[g.step]=g.items; });
+  var SC_TICK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function renderStepCheck(i){
+    var mount=$('#stepCheck'); if(!mount) return;
+    if(i<0 || i>=STEPS.length){ mount.innerHTML=''; return; }
+    var items=CL_BY[STEPS[i].id]||[];
+    var done = i < pulled;  // step already verified
+    var n = done ? items.length : 0;
+    var html='<span class="sc-label">'+(done?'Captured':'Capturing')+' · '+n+'/'+items.length+'</span>';
+    items.forEach(function(it){
+      html+='<span class="sc-item'+(done?' done':'')+'"><span class="sc-tick">'+SC_TICK+'</span>'+it+'</span>';
+    });
+    mount.innerHTML=html;
+  }
 
   // ---------- State ----------
   var state = {
@@ -666,10 +706,11 @@
     pulled=0; focus=-1; busy=false; blocked=false;
     setCrumb('chain'); show('screen-chain');
     nodataMount.innerHTML='';
+    $('#stepCheck').innerHTML='';
     buildStepEls();
     setProgress(0,TOTAL);
     updateFooter();
-    pullThen(0);   // Identity Lookup runs automatically; continues if Auto is on
+    pullThen(0);   // Account lookup runs automatically; continues if Auto is on
   }
 
   function revealNext(){ /* single-card view: nothing to pre-reveal */ }
@@ -682,6 +723,7 @@
       n.classList.toggle('expand', idx===i);
     });
     if(i>=0){ $('#stepCounter').textContent='Step '+(i+1)+' of '+TOTAL+' · '+STEPS[i].name; }
+    renderStepCheck(i);
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -695,11 +737,11 @@
     renderReq(st);
     await wait(1100);
 
-    // Edge case: identity with a non-primary number returns no record
-    if(st.id==='identity' && isNonPrimary(state.activeMobile)){
+    // Edge case: account lookup on a non-primary number returns no record
+    if(st.id==='account' && isNonPrimary(state.activeMobile)){
       setBadge(st.id,'b-empty','No record');
       node.classList.remove('active');
-      $('#out-'+st.id).innerHTML='<div class="out-row"><span class="out-k">Result</span><span class="out-v" style="color:#854d0e">No identity linked</span></div>';
+      $('#out-'+st.id).innerHTML='<div class="out-row"><span class="out-k">Result</span><span class="out-v" style="color:#854d0e">No account / UPI linked</span></div>';
       busy=false; blocked=true;
       renderNoData(); updateFooter();
       return;
@@ -709,6 +751,7 @@
     setBadge(st.id,'b-done','Verified');
     node.classList.remove('active'); node.classList.add('done');
     pulled=i+1; focus=i;
+    renderStepCheck(i);
     setProgress(pulled,TOTAL);
     revealNext();
     busy=false; updateFooter();
@@ -749,10 +792,10 @@
     nodataMount.innerHTML=
       '<div class="nodata">'+
         '<h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke-linecap="round"/></svg>This may not be the primary number</h3>'+
-        '<p>We couldn\'t find an identity linked to <b>'+fmtMobile(state.activeMobile)+'</b>. It may be a secondary number that isn\'t registered against the customer\'s PAN or Aadhaar. Add the customer\'s primary number to continue.</p>'+
+        '<p>We couldn\'t find a bank account or UPI linked to <b>'+fmtMobile(state.activeMobile)+'</b>. It may be a secondary number that isn\'t registered against the customer\'s primary bank account. Add the customer\'s primary number to continue.</p>'+
         '<div class="row">'+
           '<div class="phone-wrap"><span class="cc">🇮🇳 +91</span><input id="altMobile" inputmode="numeric" maxlength="10" placeholder="Primary mobile number" autocomplete="off"></div>'+
-          '<button class="btn btn-primary" id="altGo" style="height:auto;padding:0 18px">Retry with this number</button>'+
+          '<button class="btn btn-primary" id="altGo">Retry with this number<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
         '</div>'+
         '<div class="field-err" id="alt-err" style="display:none">Enter a valid 10-digit mobile number.</div>'+
         '<div class="keepnote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>The number that returns records becomes the <b>primary</b>. '+fmtMobile(state.activeMobile)+' is kept on the profile as an <b>“other number”</b> — you can remove it in the review step.</span></div>'+
@@ -786,44 +829,57 @@
   }
 
   function buildReview(){
-    var emp = persona.empStatus.indexOf('Employed')>=0;
-    $('#ssEmp').textContent = emp ? 'Salaried' : 'Self-emp.';
     var grid=$('#revGrid');
     grid.innerHTML =
-      sec('Contact & Identity','Bytes · Mobile Intelligence',
+      sec('Contact & Identity','Payments · Mobile to Account',
         '<div class="sec-b" style="padding-top:14px"><div class="kv"><span class="k">Full name</span><span class="v">'+persona.name+'</span></div>'+
         '<div class="kv"><span class="k">Date of birth</span><span class="v">'+persona.dob+'</span></div>'+
         '<div class="kv"><span class="k">Mobile numbers</span><span class="v" style="text-align:right"></span></div></div>'+
         '<div style="padding:0 16px 8px" id="numbersMount"></div>')+
 
-      sec('Bank Account','Bytes · Mobile to Bank Account',
+      sec('Bank Account & UPI','Payments · Mobile to Account (V3)',
         kv('Bank', persona.bankName, null)+
-        kv('Account (masked)', persona.accountMasked, 'Verified')+
+        kv('Account number', persona.accountNumber, 'Verified')+
         kv('IFSC', persona.ifsc, null)+
+        kv('Account type', persona.accountType, null)+
+        kv('UPI ID', persona.upiId, 'Verified')+
         kv('Account holder', persona.name, null))+
 
       sec('PAN & Address','Bytes · Customer Data Pull',
         kv('PAN', persona.pan, 'Verified')+
+        kv('Gender', persona.gender, null)+
         kv('Address', persona.address, 'Verified')+
         kv('Email', persona.email, null))+
 
       sec('CKYC Record','Identities · CKYC',
-        kv('CKYC ID', persona.ckycId, 'Matched')+
+        kv('CKYC number', persona.ckycId, 'Matched')+
+        kv('CKYC reference', persona.ckycRef, null)+
+        kv('Constitution', persona.constitution, null)+
+        kv('Account type', persona.ckycAccountType, null)+
+        kv("Father's name", persona.fathersName, null)+
+        kv('Gender', persona.gender, null)+
         kv('Proof of identity', persona.poi, null)+
-        kv('Proof of address', persona.poa, null))+
+        kv('Proof of address', persona.poa, null)+
+        kv('KYC date', persona.kycDate, null)+
+        kv('Identities on record', persona.numIdentity, null))+
 
-      sec('Aadhaar (DigiLocker)','Identities · eAadhaar',
+      sec('PAN & Aadhaar (DigiLocker)','Identities · DigiLocker',
+        kv('PAN (DigiLocker)', persona.pan, 'Verified')+
         kv('Aadhaar (masked)', persona.aadhaarMasked, 'XML fetched')+
         kv('Source', 'DigiLocker · Government issued', null))+
 
       sec('Employment','Identities · EPFO',
         kv('Employer', persona.employer, null)+
         kv('UAN', persona.uan, null)+
-        kv('Status', persona.empStatus, 'Active'))+
+        kv('Status', persona.empStatus, 'Active')+
+        kv('Date of joining', persona.doj, null)+
+        kv('Date of exit', persona.doe, null))+
 
       sec('Business / MSME','Bytes · PAN to Udyam',
-        kv('Business / MSME', persona.udyam, null, true)+
-        kv('Udyam registration', 'Not found', null));
+        kv('Udyam reg. number', persona.udyamNumber, 'Registered')+
+        kv('Enterprise', persona.enterpriseName, null)+
+        kv('Type', persona.enterpriseType, null)+
+        kv('Status', persona.udyamStatus, 'Active'));
 
     // mount numbers + remove handler
     $('#numbersMount').innerHTML = numbersBlock();
@@ -852,7 +908,7 @@
     var ref='DCNTRO-'+Math.random().toString(36).slice(2,7).toUpperCase()+'-'+Date.now().toString().slice(-5);
     $('#refId').textContent=ref;
     var extra = state.otherMobile && !state.removedOther ? ' One secondary number was retained on the profile.' : '';
-    $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All seven Decentro verification sources matched.'+extra;
+    $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All six Decentro verification sources matched.'+extra;
     setCrumb('success'); show('screen-success'); window.scrollTo({top:0,behavior:'smooth'});
   });
 
