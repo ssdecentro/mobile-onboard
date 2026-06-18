@@ -195,6 +195,19 @@
   .nodata .phone-wrap{flex:1;min-width:200px}
   .nodata .row .btn{height:46px;white-space:nowrap}
   @media (max-width:430px){ .nodata .row .btn{flex:1 1 100%} }
+  .otp-card{border:1px solid var(--proc-bd);background:#f5f9ff;border-radius:var(--radius);padding:18px;margin-top:14px;animation:fade .3s ease}
+  .otp-card h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .otp-card h3 svg{width:18px;height:18px;color:var(--proc-fg)}
+  .otp-card p{font-size:13px;color:var(--subtle);margin-top:8px}
+  .otp-boxes{display:flex;gap:8px;margin-top:15px;flex-wrap:wrap}
+  .otp-box{width:46px;height:52px;border:1px solid var(--border);border-radius:10px;text-align:center;font-size:20px;font-weight:700;font-family:inherit;color:var(--fg);background:#fff;transition:.15s}
+  .otp-box:focus{outline:0;border-color:#000;box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+  .otp-err{font-size:12px;color:var(--error-fg);font-weight:600;margin-top:9px;display:none}
+  .otp-actions{display:flex;gap:14px;align-items:center;margin-top:16px;flex-wrap:wrap}
+  .otp-actions .btn{height:46px;white-space:nowrap}
+  .otp-resend{font-size:12px;font-weight:600;color:var(--subtle);background:none;border:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .otp-hint{font-size:11px;font-weight:600;color:var(--muted)}
+  @media (max-width:430px){ .otp-box{width:13vw;max-width:46px;height:50px;font-size:18px} .otp-actions .btn{flex:1 1 100%} }
   .keepnote{font-size:11.5px;color:var(--muted);margin-top:11px;display:flex;gap:7px;align-items:flex-start}
   .keepnote svg{width:14px;height:14px;flex:none;margin-top:1px;color:var(--subtle)}
 
@@ -369,6 +382,7 @@
         <div class="step-check" id="stepCheck"></div>
         <div class="steps" id="steps"></div>
         <div id="nodataMount"></div>
+        <div id="otpMount"></div>
         <div class="chain-foot" id="chainFoot">
           <button class="btn btn-ghost" id="backBtn" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><path d="M19 12H5M11 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -690,6 +704,7 @@
     pulled=0; focus=-1; busy=false; blocked=false;
     setCrumb('chain'); show('screen-chain');
     nodataMount.innerHTML='';
+    $('#otpMount').innerHTML='';
     $('#stepCheck').innerHTML='';
     buildStepEls();
     setProgress(0,TOTAL);
@@ -731,10 +746,24 @@
       return;
     }
 
+    // DigiLocker consent: pause for a 6-digit OTP before fetching documents
+    if(st.id==='digilocker'){
+      setBadge(st.id,'b-proc','OTP sent',false);
+      busy=false; blocked=true;
+      renderOtpGate(i); updateFooter();
+      return;
+    }
+
+    finishStep(i);
+  }
+
+  function finishStep(i){
+    var st=STEPS[i], node=$('#st-'+st.id);
     renderOut(st);
     setBadge(st.id,'b-done','Verified');
     node.classList.remove('active'); node.classList.add('done');
     pulled=i+1; focus=i;
+    blocked=false;
     renderStepCheck(i);
     setProgress(pulled,TOTAL);
     revealNext();
@@ -798,6 +827,51 @@
       pullThen(0);
     });
     alt.focus();
+  }
+
+  // ---------- DigiLocker OTP gate ----------
+  function renderOtpGate(i){
+    var mount=$('#otpMount');
+    var boxesHtml=''; for(var b=0;b<6;b++){ boxesHtml+='<input class="otp-box" inputmode="numeric" maxlength="1" autocomplete="off">'; }
+    mount.innerHTML=
+      '<div class="otp-card">'+
+        '<h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg>DigiLocker OTP verification</h3>'+
+        '<p>An OTP has been sent to the mobile number registered with DigiLocker (<b>'+fmtMobile(state.activeMobile)+'</b>). Enter it to authorise fetching the PAN &amp; Aadhaar documents.</p>'+
+        '<div class="otp-boxes">'+boxesHtml+'</div>'+
+        '<div class="otp-err" id="otp-err">Please enter the 6-digit OTP.</div>'+
+        '<div class="otp-actions">'+
+          '<button class="btn btn-primary" id="otpVerify">Verify &amp; fetch documents<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+          '<button class="otp-resend" id="otpResend" type="button">Resend OTP</button>'+
+          '<span class="otp-hint">Demo · enter any 6 digits</span>'+
+        '</div>'+
+      '</div>';
+    var boxes=Array.prototype.slice.call(mount.querySelectorAll('.otp-box'));
+    var err=$('#otp-err');
+    boxes.forEach(function(box,idx){
+      box.addEventListener('input',function(){
+        this.value=this.value.replace(/\D/g,'').slice(0,1);
+        err.style.display='none';
+        if(this.value && idx<boxes.length-1) boxes[idx+1].focus();
+      });
+      box.addEventListener('keydown',function(e){
+        if(e.key==='Backspace' && !this.value && idx>0) boxes[idx-1].focus();
+      });
+      box.addEventListener('paste',function(e){
+        var d=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+        if(d){ e.preventDefault(); boxes.forEach(function(bx,k){ bx.value=d[k]||''; }); (boxes[Math.min(d.length,5)]).focus(); err.style.display='none'; }
+      });
+    });
+    function otpValue(){ return boxes.map(function(bx){return bx.value;}).join(''); }
+    $('#otpVerify').addEventListener('click',function(){
+      if(!/^\d{6}$/.test(otpValue())){ err.style.display='block'; return; }
+      mount.innerHTML='';
+      var st=STEPS[i];
+      setBadge(st.id,'b-proc','Verifying…',true);
+      busy=true; blocked=false; updateFooter();
+      wait(800).then(function(){ finishStep(i); scheduleAuto(); });
+    });
+    $('#otpResend').addEventListener('click',function(){ boxes.forEach(function(bx){bx.value='';}); boxes[0].focus(); });
+    boxes[0].focus();
   }
 
   // ---------- Review ----------
