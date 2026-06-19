@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Decentro · Mobile-First Onboarding (Account-First)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,7 @@
     --shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px rgba(16,24,40,.06);
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  button{font-family:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   /* allow nested flex/grid children to shrink instead of forcing horizontal overflow */
   .app,.brand,.stage,.stage-inner,.steps,.step,.step-top,.step-meta,.body-inner,.body-inner>div,
   .feed,.sec,.sec-b,.kv,.summary-strip,.ss,.rev-grid,.chain-head,.chain-foot,.review-actions,
@@ -36,8 +37,8 @@
     color:var(--fg); background:#eef2f6;
     -webkit-font-smoothing:antialiased; line-height:1.45;
   }
-  .app{min-height:100vh; display:grid; grid-template-columns:minmax(360px,440px) 1fr;}
-  @media (max-width:920px){ .app{grid-template-columns:1fr} }
+  .app{min-height:100vh; min-height:100svh; display:grid; grid-template-columns:minmax(360px,440px) 1fr;}
+  @media (max-width:920px){ .app{grid-template-columns:1fr; min-height:auto} }
 
   /* ---------- BRAND PANEL ---------- */
   .brand{
@@ -84,7 +85,7 @@
 
   .screen{display:none;animation:fade .35s ease}
   .screen.active{display:flex;flex-direction:column;flex:1}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
 
   h1.h{font-size:24px;font-weight:800;letter-spacing:-.4px}
   p.lead{font-size:14px;color:var(--subtle);margin-top:8px;max-width:560px}
@@ -109,7 +110,7 @@
   .consent .ct b{color:var(--fg)}
   .consent a{color:#000;text-decoration:underline;text-underline-offset:2px}
 
-  .btn{font-family:inherit;font-size:13px;font-weight:600;border-radius:var(--radius);height:46px;padding:0 20px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:.15s}
+  .btn{font-family:inherit;font-size:13px;font-weight:600;border-radius:var(--radius);height:46px;padding:0 20px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:.15s;-webkit-appearance:none;appearance:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
   .btn-primary{background:#000;color:#fff}
   .btn-primary:hover{background:#171717}
   .btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
@@ -279,7 +280,7 @@
   }
   @media (max-width:400px){
     .stage{padding:16px 12px}
-    .phone-wrap input{font-size:15px}
+    .phone-wrap input{font-size:16px}
     .step-name{font-size:13px}
     .api-tag{font-size:9px;padding:2px 5px}
     .step-ico{width:34px;height:34px}
@@ -287,6 +288,17 @@
     .kv{flex-direction:column;align-items:flex-start;gap:3px}
     .kv .v{text-align:left}
     .num-chip{font-size:12px}
+  }
+  /* mobile: pin the action bars so Next / Confirm are always tappable (never under the browser toolbar) */
+  @media (max-width:760px){
+    .stage{padding-bottom:max(20px,env(safe-area-inset-bottom))}
+    .chain-foot,.review-actions{
+      position:sticky; bottom:0; z-index:40;
+      margin-top:16px;
+      padding:12px 0 max(12px,env(safe-area-inset-bottom));
+      background:#eef2f6;
+      border-top:1px solid var(--border);
+    }
   }
   .vis-hidden{display:none !important}
 </style>
@@ -674,7 +686,13 @@
   var pulled=0, focus=-1, busy=false, blocked=false;
   var mode='manual', autoTimer=null, AUTO_DELAY=1200;
 
-  function pullThen(i){ return pullStep(i).then(scheduleAuto); }
+  function pullThen(i){
+    return pullStep(i).then(scheduleAuto).catch(function(err){
+      // never let an unexpected error leave the controls disabled
+      busy=false; blocked=false; updateFooter();
+      if(window&&window.console) console.warn('step error', err);
+    });
+  }
 
   function scheduleAuto(){
     clearTimeout(autoTimer);
@@ -723,7 +741,7 @@
     });
     if(i>=0){ $('#stepCounter').textContent='Step '+(i+1)+' of '+TOTAL+' · '+STEPS[i].name; }
     renderStepCheck(i);
-    window.scrollTo({top:0,behavior:'smooth'});
+    try{ window.scrollTo(0,0); }catch(e){}
   }
 
   async function pullStep(i){
@@ -785,7 +803,7 @@
   function goReview(){
     state.primaryMobile=state.activeMobile;
     if(state.enteredMobile && state.enteredMobile!==state.primaryMobile){ state.otherMobile=state.enteredMobile; }
-    buildReview(); setCrumb('review'); show('screen-review'); window.scrollTo({top:0,behavior:'smooth'});
+    buildReview(); setCrumb('review'); show('screen-review'); try{window.scrollTo(0,0);}catch(e){}
   }
 
   nextBtn.addEventListener('click',function(){
@@ -961,14 +979,14 @@
     $('#refId').textContent=ref;
     var extra = state.otherMobile && !state.removedOther ? ' One secondary number was retained on the profile.' : '';
     $('#successMsg').textContent='The customer\'s verified profile has been created and stored. All five Decentro verification sources matched.'+extra;
-    setCrumb('success'); show('screen-success'); window.scrollTo({top:0,behavior:'smooth'});
+    setCrumb('success'); show('screen-success'); try{window.scrollTo(0,0);}catch(e){}
   });
 
   function resetAll(){
     clearTimeout(autoTimer);
     mobileInput.value=''; consent.checked=false; refreshStart();
     state={primaryMobile:null,enteredMobile:null,otherMobile:null,activeMobile:null,removedOther:false};
-    setCrumb('input'); show('screen-input'); window.scrollTo({top:0,behavior:'smooth'});
+    setCrumb('input'); show('screen-input'); try{window.scrollTo(0,0);}catch(e){}
   }
   $('#backToStart').addEventListener('click',resetAll);
   $('#freshBtn').addEventListener('click',resetAll);
